@@ -2799,7 +2799,7 @@ function toggleGameMusic() {
 		    audioNarrationActive = false;
 			gameMusicControl.classList.remove('on');
 			soundControl.src = "assets/images/audio-off.png";
-			soundManager.stopAll();
+			createjs.Sound.stop();
 
 			//gameMusic.pause();
 		} else {
@@ -2872,7 +2872,7 @@ spinButton.addEventListener('click', function(e) {
 			characterInfoLayer.classList.add('show')
 			spinButton.classList.remove('point');
 			selectCharacter(playerCharacterArray);
-			soundManager.stopAll();
+			createjs.Sound.stop();
 
 			}
 		}
@@ -3717,7 +3717,7 @@ gameOverlay.addEventListener('click', function() {
 var sarahInScene = currentScene.getElementsByClassName('sarah');
 		sarahInScene[0].classList.remove('talk');
 		initSpriteAnimInScene(currentSceneIndex , currentSubSceneIndex);
-		soundManager.stopAll();
+		createjs.Sound.stop();
 
 			conversationLayer.classList.remove('sarah-review-started');
 		} else if(hasClass(conversationLayer, 'louise-review')){
@@ -3808,7 +3808,7 @@ controlMode.addEventListener("click", function(){
 OOILayer.addEventListener('click', function() {
 	conversationLayer.classList.add('hide');
 
-    soundManager.stopAll();
+    createjs.Sound.stop();
 
 
 
@@ -3865,7 +3865,7 @@ function playAudio(audioFileOne, audioFileTwo,callback) {
 	if (audioNarrationActive) {
 		
 
-		soundManager.stopAll();
+		createjs.Sound.stop();
 		if (window.location.href.indexOf("restrictClick") > -1) {
 			disableClickLayer.classList.remove('hide');
 		}
@@ -3878,21 +3878,36 @@ function playAudio(audioFileOne, audioFileTwo,callback) {
 		// 	audio.play();
 		// }, 150);
 		setTimeout(function () {
-			soundManager.play(audioFileOne, {
-				onfinish: function(){
-					if (audioFileTwo) {
+			// soundManager.play(audioFileOne, {
+			// 	onfinish: function(){
+			// 		if (audioFileTwo) {
 
-						playAudio(audioFileTwo);
-					}
+			// 			playAudio(audioFileTwo);
+			// 		}
 
-					// console.log('audio-complete');
-					if (window.location.href.indexOf("restrictClick") > -1) {
-						disableClickLayer.classList.add('hide');
-					}
+			// 		// console.log('audio-complete');
+			// 		if (window.location.href.indexOf("restrictClick") > -1) {
+			// 			disableClickLayer.classList.add('hide');
+			// 		}
 
-					if(callback){
-						callback();
-					}
+			// 		if(callback){
+			// 			callback();
+			// 		}
+			// 	}
+			// })
+			var instance = createjs.Sound.play(audioFileOne);
+			instance.addEventListener("complete",function(){
+				if (audioFileTwo) {
+					playAudio(audioFileTwo);
+				}
+
+				// console.log('audio-complete');
+				if (window.location.href.indexOf("restrictClick") > -1) {
+					disableClickLayer.classList.add('hide');
+				}
+
+				if(callback){
+					callback();
 				}
 			})
 		}, 50);
@@ -4105,7 +4120,7 @@ playerOOITags   = [
 
 function navigateApartmentRooms(info){
 
-soundManager.stopAll();
+createjs.Sound.stop();
 
 if (info == 'left'){
     rightNav.classList.remove('hide');
@@ -4445,7 +4460,7 @@ function closeAilmentNotes(){
 			guideHeader.classList.remove('hide');
 			characterSelectionWidget.classList.remove('hide');
 			dismissAilmentButton.innerHTML = "Dismiss";
-			soundManager.stopAll();
+			createjs.Sound.stop();
 			//at this point of the game hints become useful.
 			//seting the initial hint(we are at spinning wheel)
 			currentHint = infoScriptArray.wheelSpin.informationText + closeHint;
@@ -4465,7 +4480,7 @@ function closeAilmentNotes(){
 
 	}else{
 		ailmentNotes.classList.add('hide');
-		soundManager.stopAll();
+		createjs.Sound.stop();
 	}
 }
 hintInterface.addEventListener("click",function(){
@@ -4523,7 +4538,7 @@ function hideHint(){
 	//controlInfo.classList.remove("hide");
 	infoText.classList.add("hide");
 
-	soundManager.stopAll();
+	createjs.Sound.stop();
 
 }
 
@@ -4626,7 +4641,7 @@ console.log(playerOOITags);
 
 function closeTagNotes(info){
 	tagNotes.classList.add("hide");
-	soundManager.stopAll();
+	createjs.Sound.stop();
 }
 
 function selectCharacter(info) {
@@ -4872,7 +4887,7 @@ function objectsExplored(){
 function closeOOIDescription(a){
 
 
-	soundManager.stopAll();
+	createjs.Sound.stop();
 
 
 	objectEffect.classList.remove('active');
@@ -4976,7 +4991,7 @@ function showInfo(){
 function toggleMap() {
 
 
-   soundManager.stopAll();
+   createjs.Sound.stop();
 
 
 	if (hasClass(gameMap, 'hide')) {
@@ -5194,7 +5209,7 @@ function NPCTagResponse(){
 		controlInfo.classList.add("hide-perm");
 		//this function will be called when the audio is done or when user clicks on disableClickLayer.
 		var afterAudio = function(){
-			soundManager.stopAll();
+			createjs.Sound.stop();
 
 			apartmentRedirect.classList.add("hide");
 
@@ -5540,72 +5555,48 @@ function preLoadNPCImages(){
 }
 
 function loadSounds() {
-
-	var completedCount = 0, soundsLength = sounds.length;
-
-	// initialize the sound manager 
-	soundManager.url = ''; 
-	soundManager.flashVersion = 8; 
-	soundManager.useHighPerformance = false; // reduces delays 
-	
-	// reduce the default 1 sec delay to 500 ms 
-	soundManager.flashLoadTimeout = 500; 
-	
-	// mp3 is required by default, but we don't want any requirements 
-	soundManager.audioFormats.mp3.required = true; 
-	
-	// flash may timeout if not installed or when flashblock is installed 
-	soundManager.ontimeout(function(status) { 
-		// no flash, go with HTML5 audio 
-		soundManager.useHTML5Audio = true; 
-		soundManager.preferFlash = false; 
-		soundManager.reboot(); 
-	}); 
-	
-	// soundManager.onready(function() { 
-	// 	// ok to show the button to run the sound sample 
-	// 	$('#sample4-run').show(); 
-	// }); 
-	var soundNames = sounds,
-		loader = new PxLoader(),
-		i, len, url;
-
-	// queue each sound for loading 
-	for (i = 0; i < soundsLength; i++) {
-
-		// see if the browser can play our audio
-		if (!soundManager.canPlayURL(soundNames[i])) {
-			continue; // can't be played 
+	var count = 0;
+	var length = sounds.length;
+	createjs.Sound.addEventListener("fileload", handleFileLoad);
+	for(var i=0;i<length;i++){
+		var label = sounds[i].slice(14);
+		if(!createjs.Sound.registerSound({id:label, src:sounds[i]})){
+			count++;
+			progressLine.style.transitionDuration = "0.2s"
+			progressLine.style.width = (26.75+(26.75*count/length)).toString() +"%";
+			console.error("not done "+i);
+			if(length==count){
+				setTimeout(function() {
+					initGame();
+				}, 500);
+			}
 		}
-
-		// queue the sound using the name as the SM2 id
-		// remove prefix 'assets/sounds/' from everything 
-		var label = soundNames[i].slice(14);
-		loader.addSound(label, soundNames[i]);
+	}
+	function handleFileLoad(event) {
+	    // A sound has been preloaded.
+		count+=1;
+      	progressLine.style.transitionDuration = "0.2s"
+		progressLine.style.width = (26.75+(26.75*count/length)).toString() +"%";
+	    console.log("Preloaded: "+count, event.id, event.src,event);
+		if(length==count){
+			setTimeout(function() {
+				initGame();
+			}, 500);
+		}
 	}
 
-	// listen to load events 
-	loader.addProgressListener(function (e) {
-		completedCount++;
-		progressLine.style.transitionDuration = "0.2s"
-		progressLine.style.width = (26.75 + (26.75 * completedCount / soundsLength )).toString() + "%";
-    });
-    loader.addCompletionListener(function () {
+}
 
-		//  progressLine.style.transitionDuration = "0s"
-		progressLine.style.width = "53.5%";
-		soundManager.onready(function() { 
-			setTimeout(initGame, 1000);
-		}); 
-
-		
-    });
-
-	loader.start();
+function loadNextSound(loaded){
+	// remove prefix 'assets/sounds/' from everything 
+	var label = sounds[loaded].slice(14);
+	if(!createjs.Sound.registerSound({id:label, src:sounds[loaded]})){
+		count++;
+	};
 }
 
 function tourApartment() {
-	soundManager.stopAll();
+	createjs.Sound.stop();
 	toggleMap();
 
 	dialogueCount = 0 ;
